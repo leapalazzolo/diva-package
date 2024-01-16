@@ -14,9 +14,9 @@ network_params:
 participants:
   - el_client_type: geth
     cl_client_type: nimbus
-    validator_count: 65
+    validator_count: 1
 diva:
-  nodes: 5
-  threshold: 3
-  validator_count: 1
+  nodes: 1
+  threshold: 1
+  validator_count: 65
   verify_fee_recipient: true
