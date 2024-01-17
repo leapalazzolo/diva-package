@@ -2,7 +2,9 @@ ethereum_package = import_module("github.com/kurtosis-tech/ethereum-package/main
 genesis_constants = import_module(
     "github.com/kurtosis-tech/ethereum-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star"
 )
-
+ethereum_input_parser = import_module(
+    "github.com/kurtosis-tech/ethereum-package/src/package_io/input_parser.star"
+)
 diva_server = import_module("./src/diva-server.star")
 diva_sc = import_module("./src/diva-sc.star")
 diva_operator = import_module("./src/operator.star")
@@ -14,6 +16,9 @@ nimbus = import_module("./src/nimbus.star")
 utils = import_module("./src/utils.star")
 
 DEFAULT_NUM_VALIDATOR_KEYS_PER_NODE = 64
+DEFAULT_DIVA_VALIDATOR_COUNT = 1
+DEFAULT_DIVA_TOTAL_VALIDATOR_COUNT = 64
+DEFAULT_DIVA_NODES = 5
 
 
 def run(plan, args):
@@ -33,6 +38,25 @@ def run(plan, args):
     )
 
 
+    diva_validator_count=diva_params.get(
+        "diva_validator_count", DEFAULT_DIVA_VALIDATOR_COUNT
+    )
+
+    total_validator_count=diva_params.get(
+        "total_validator_count", DEFAULT_DIVA_TOTAL_VALIDATOR_COUNT
+    )
+
+    nodes=diva_params.get(
+        "nodes", DEFAULT_DIVA_NODES
+    )
+
+    args["participants"][0]["validator_count"] = diva_validator_count
+    args["participants"][1]["validator_count"] = total_validator_count - diva_validator_count
+
+    if len(args["participants"]) <2:
+            fail(
+                "We need at least two participants"
+            )
     ethereum_network = ethereum_package.run(plan, args)
     plan.print("Succesfully launched an Ethereum Network")
 
@@ -77,7 +101,7 @@ def run(plan, args):
     validators_to_shutdown = []
     diva_addresses = []
     signer_urls = []
-    for index in range(0, constants.NUMBER_OF_DIVA_NODES):
+    for index in range(0, nodes):
         node, node_url, signer_url = diva_server.start_node(
             plan,
             # TODO improve on this name for diva
@@ -127,7 +151,7 @@ def run(plan, args):
     )    
     plan.stop_service(first_participant_validator_service_name)
 
-    for index in range(0, constants.NUMBER_OF_DIVA_NODES):
+    for index in range(0, nodes):
         nimbus.launch(
             plan,
             "diva-validator-{0}".format(index),

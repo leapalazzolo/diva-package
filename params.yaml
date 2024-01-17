@@ -2,11 +2,14 @@ network_params:
   num_validator_keys_per_node: 1
   genesis_delay: 120
 participants:
+  # First participant will be used by Diva
   - el_client_type: geth
     cl_client_type: teku
     cl_split_mode_enabled: true
   - el_client_type: geth
     cl_client_type: nimbus
-    validator_count: 65
 diva_params:
   verify_fee_recipient: true
+  nodes: 5
+  total_validator_count: 64
+  diva_validator_count: 1
