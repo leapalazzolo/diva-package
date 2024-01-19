@@ -22,15 +22,8 @@ DEFAULT_DIVA_NODES = 5
 
 
 def run(plan, args):
-    network_params = args.get(
-        "network_params",
-        {"num_validator_keys_per_node": DEFAULT_NUM_VALIDATOR_KEYS_PER_NODE},
-    )
     diva_params = args.get(
         "diva_params"
-    )
-    num_validator_keys_per_node = network_params.get(
-        "num_validator_keys_per_node", DEFAULT_NUM_VALIDATOR_KEYS_PER_NODE
     )
 
     verify_fee_recipient=diva_params.get(
@@ -140,7 +133,7 @@ def run(plan, args):
     )
 
     diva_cli.start_cli(plan, configuration_tomls)
-    diva_cli.deploy(plan, first_node_index, num_validator_keys_per_node)
+    diva_cli.deploy(plan, first_node_index, diva_validator_count)
 
     plan.print(
         "stopping validator {0}".format(first_participant_validator_service_name)
